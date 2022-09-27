@@ -1,59 +1,86 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, Button, Alert } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
-import * as Application from 'expo-application';
+import * as Application from "expo-application";
 import axios from "axios";
-export default function App() {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [gateId, setGateId] = useState(null);
-  const [scanned, setScanned] = useState(false);
-  const urlScan =
-    "https://expressjs-prisma-production-0a4e.up.railway.app/scans";
-  useEffect(() => {
-    const getBarCodeScannerPermissions = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === "granted");
-    };
-    getBarCodeScannerPermissions();
-  }, []);
-
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    // setGateId(data)
-    const data_tosubmit = {
-      deviceId: Application.androidId,
-      gateId: data,
-    };
-    if (data) {
-      axios
-        .post(urlScan, data_tosubmit)
-        .then(function (response) {
-          alert("Success");
-          console.log(response);
-        })
-        .catch((error) => {
-          alert(error);
-        });
-    }
-  };
-
-  if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
-  }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
-
+import {
+  MaterialCommunityIcons,
+  FontAwesome,
+  MaterialIcons,
+} from "@expo/vector-icons";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import HomeScreen from "./pages/HomeScreen";
+import HistoryScreen from "./pages/HistoryScreen";
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+function HomeStack() {
   return (
-    <View style={styles.container}>
-      <BarCodeScanner
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
+    <Stack.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ title: "Home" }}
       />
-      {scanned && (
-        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
-      )}
-    </View>
+    </Stack.Navigator>
+  );
+}
+
+function HistoryStack() {
+  return (
+    <Stack.Navigator
+      initialRouteName="History"
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen
+        name="History"
+        component={HistoryScreen}
+        options={{ title: "History" }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator initialRouteName="HomeStack">
+        <Tab.Screen
+          name="HomeStack"
+          component={HomeStack}
+          options={{
+            tabBarActiveTintColor: "#42f44b",
+            tabBarLabel: "Home",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="home" color={color} size={size} />
+            ),
+            title: "Scan",
+            headerTitleStyle: { alignSelf: "center" },
+          }}
+        />
+        <Tab.Screen
+          name="SettingsStack"
+          component={HistoryStack}
+          options={{
+            tabBarActiveTintColor: "#42f44b",
+            tabBarLabel: "Settings",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name="history" size={size} color={color} />
+            ),
+            title: "History",
+            headerTitleStyle: { alignSelf: "center" },
+          }}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 

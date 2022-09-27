@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "jot-app",
+    "name": "Jot App",
     "slug": "jot-app",
-    "owner":"leavchandara",
+    "owner": "leavchandara",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,10 +25,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.leavchandara.jotapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fdfecc13-a579-4fa4-9955-d0b4bf171e6a"
+      }
     }
   }
 }
