@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Jot App",
+    "name": "QR ចំណត",
     "slug": "jot-app",
     "owner": "leavchandara",
     "version": "1.0.0",
@@ -19,7 +19,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.leavchandara.jotapp"
     },
     "android": {
       "adaptiveIcon": {

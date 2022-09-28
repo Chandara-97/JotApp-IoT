@@ -17,20 +17,31 @@ const hieght = Dimensions.get("screen").height;
 const HistoryScreen = () => {
   const [checkin, setCheckin] = React.useState(null);
   const [checkout, setCheckout] = React.useState(null);
-  React.useEffect(() => {
-    read("checkin");
-    read("checkout");
-  }, []);
-  const read = async (key) => {
+  const read_checkin = async (key) => {
     try {
       var jsonValue = await AsyncStorage.getItem(key);
-      setCheckin(jsonValue ?? null);
-      setCheckout(jsonValue ?? null);
-      return jsonValue != null ? JSON.parse(jsonValue) : null;
+      setCheckin(JSON.parse(jsonValue));
+      // return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (e) {
-      alert("Error Read to storage:", e);
+      console.log(e);
+      //   alert("Error Read to storage:", e);
     }
   };
+  const read_checkout = async (key) => {
+    try {
+      var jsonValue = await AsyncStorage.getItem(key);
+      setCheckout(JSON.parse(jsonValue));
+      // return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      console.log(e);
+      //   alert("Error Read to storage:", e);
+    }
+  };
+  React.useEffect(() => {
+    read_checkin("checkin");
+    read_checkout("checkout");
+  }, [checkin, checkout]);
+
   return (
     <SafeAreaView>
       <View
@@ -48,7 +59,7 @@ const HistoryScreen = () => {
           Check in:
           <Text
             style={{
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: "bold",
             }}
           >
@@ -65,7 +76,7 @@ const HistoryScreen = () => {
           Check Out:
           <Text
             style={{
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: "bold",
             }}
           >

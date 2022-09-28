@@ -17,6 +17,7 @@ import { wirte, read } from "../libs/storage";
 import moment from "moment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { navigate } from "./../libs/navigationService";
+import { Children } from "react/cjs/react.production.min";
 
 const HomeScreen = ({ navigation }) => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -24,12 +25,21 @@ const HomeScreen = ({ navigation }) => {
   const urlScan = `${baseURL}/scans`;
   const [checkin, setCheckin] = React.useState(null);
   const [checkout, setCheckout] = React.useState(null);
-  const read = async (key) => {
+  const read_checkin = async (key) => {
     try {
       var jsonValue = await AsyncStorage.getItem(key);
-      setCheckin(jsonValue ?? null);
-      setCheckout(jsonValue ?? null);
-      return jsonValue != null ? JSON.parse(jsonValue) : null;
+      setCheckin(JSON.parse(jsonValue));
+      // return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      console.log(e);
+      //   alert("Error Read to storage:", e);
+    }
+  };
+  const read_checkout = async (key) => {
+    try {
+      var jsonValue = await AsyncStorage.getItem(key);
+      setCheckout(JSON.parse(jsonValue));
+      // return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (e) {
       console.log(e);
       //   alert("Error Read to storage:", e);
@@ -41,31 +51,33 @@ const HomeScreen = ({ navigation }) => {
       setHasPermission(status === "granted");
     };
     getBarCodeScannerPermissions();
-    read("checkin");
-    read("checkout");
+    read_checkin("checkin");
+    read_checkout("checkout");
   }, []);
-
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = ({ type, data }) => {  
     setScanned(true);
+    const gateId  =JSON.parse(data)
+    // console.warn("gateID:",typeof gateId.gateId)
     const data_tosubmit = {
       deviceId: Application.androidId,
-      gateId: data,
+      ...gateId
     };
     const dateTimeFomart = moment().format("MMMM Do YYYY - h:mm:ss a");
     if (data) {
       axios
         .post(urlScan, data_tosubmit)
         .then(function (response) {
-          if (!checkin) {
+          if (checkin === null) {
             wirte("checkin", dateTimeFomart);
+            alert("Checkin Success");
             navigation.navigate("SettingsStack");
           }
-          if (checkin && !checkout) {
+          if (checkin && checkout === null) {
             wirte("checkout", dateTimeFomart);
+            alert("Checkout Success");
             navigation.navigate("SettingsStack");
           }
-          alert("Success:", dateTimeFomart);
-          console.log(response);
+          console.log(response.data);
         })
         .catch((error) => {
           alert(error);
@@ -74,7 +86,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
   if (hasPermission === null) {
-    //   return <Text>Requesting for camera permission</Text>;
     return <ActivityIndicator size={32} />;
   }
   if (hasPermission === false) {
@@ -85,6 +96,7 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        // onBarCodeScanned={handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />
       {scanned && (
